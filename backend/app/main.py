@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.routers import analyses, resumes
+from app.routers import analyses, job_postings, resumes
 
 
 @asynccontextmanager
@@ -49,6 +49,7 @@ async def generic_exception_handler(request: Request, exc: Exception):
 
 app.include_router(resumes.router)
 app.include_router(analyses.router)
+app.include_router(job_postings.router)
 
 
 @app.get("/health")

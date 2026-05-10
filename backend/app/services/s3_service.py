@@ -47,3 +47,12 @@ def _presigned_url_sync(s3_key: str, expiry: int) -> str:
 
 async def get_presigned_url(s3_key: str, expiry: int = 3600) -> str:
     return await asyncio.to_thread(_presigned_url_sync, s3_key, expiry)
+
+
+def _delete_sync(s3_key: str) -> None:
+    client = _get_s3_client()
+    client.delete_object(Bucket=settings.s3_bucket_name, Key=s3_key)
+
+
+async def delete_file(s3_key: str) -> None:
+    await asyncio.to_thread(_delete_sync, s3_key)

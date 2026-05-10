@@ -33,6 +33,7 @@ export interface PrepPlan {
   system_design_topics: string[];
   behavioral_focus: string[];
   interview_signals: string[];
+  glassdoor_sources?: string[];
   estimated_total_prep_days: number;
   timeline_breakdown: string;
 }
@@ -68,4 +69,9 @@ export interface AnalysisCreateResponse {
   analysis_id: number;
   status: string;
   from_cache: boolean;
+}
+
+export interface MyResumeResponse {
+  resume_id: number;
+  filename: string;
 }

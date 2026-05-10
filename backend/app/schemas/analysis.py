@@ -38,6 +38,7 @@ class PrepPlan(BaseModel):
     system_design_topics: list[str] = Field(default_factory=list)
     behavioral_focus: list[str] = Field(default_factory=list)
     interview_signals: list[str] = Field(default_factory=list)
+    glassdoor_sources: list[str] = Field(default_factory=list)
     estimated_total_prep_days: int = Field(ge=1)
     timeline_breakdown: str
 

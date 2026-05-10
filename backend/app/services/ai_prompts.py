@@ -43,22 +43,25 @@ Return JSON with this exact schema:
 }}"""
 
 
-INTERVIEW_SIGNALS_SYSTEM = """You are an expert with deep knowledge of software engineering interview processes at major tech companies.
-Use your knowledge of company engineering culture, interview reputation, and hiring patterns.
-Respond ONLY with valid JSON matching the schema exactly. No markdown, no explanation."""
+INTERVIEW_SIGNALS_SYSTEM = """You are an expert at summarizing software engineering interview experiences.
+You are given raw text snippets from Glassdoor interview reviews found via Google search.
+Summarize them into structured interview signals. Respond ONLY with valid JSON. No markdown."""
 
-INTERVIEW_SIGNALS_USER = """Based on your knowledge of {company_name}'s engineering interview process, provide interview signals for a {role_type} role at the {seniority} level.
+INTERVIEW_SIGNALS_USER = """Summarize these Glassdoor interview snippets for a software engineering role at {company_name}.
 
-Use your training knowledge about this company's interview reputation, common topics, round structure, and difficulty. If you have limited knowledge about this specific company, provide signals based on similar companies in the same space.
+Snippets:
+{snippets}
 
 Return JSON with this exact schema:
 {{
-  "round_types": ["e.g., Phone screen, Technical phone, System design, Coding x2, Bar raiser, Team fit"],
-  "common_topics": ["specific technical topics known to appear frequently at this company"],
+  "round_types": ["list of interview round types mentioned"],
+  "common_topics": ["technical topics that came up"],
   "coding_difficulty": "easy|medium|hard",
   "coding_style": "leetcode|systems|take_home|pair_programming|mixed",
-  "notes": ["important notes about this company's interview culture and what candidates report"]
-}}"""
+  "notes": ["key observations from the reviews"]
+}}
+
+If snippets are empty or irrelevant, return reasonable defaults based on typical software engineering interviews."""
 
 
 PREP_PLAN_SYSTEM = """You are a senior staff engineer and interview coach helping a software engineer prepare for a specific job interview.
@@ -129,3 +132,26 @@ Return JSON with this exact schema:
   "estimated_total_prep_days": 14,
   "timeline_breakdown": "Specific week-by-week breakdown of how to allocate prep time"
 }}"""
+
+
+JOB_EXTRACTION_SYSTEM = """You are an expert at parsing job postings from raw webpage text.
+Extract structured job information accurately. If a field cannot be determined with confidence, return an empty string.
+Respond ONLY with valid JSON matching the schema exactly. No markdown, no explanation."""
+
+JOB_EXTRACTION_USER = """Extract the job posting details from this raw webpage text.
+
+Webpage text (first 8000 characters):
+{page_text}
+
+Return JSON with this exact schema:
+{{
+  "company_name": "name of the hiring company (not a job board like LinkedIn/Greenhouse/Lever), max 200 chars",
+  "role_title": "exact job title as written, max 200 chars",
+  "jd_text": "the full job description text including responsibilities, requirements, and qualifications"
+}}
+
+Rules:
+- company_name: the actual employer, not the job board platform
+- role_title: job title only, no location or salary decorators
+- jd_text: must be actual job description prose, minimum 50 characters; return empty string if no recognisable job description found
+- Return empty string for any field you cannot determine"""

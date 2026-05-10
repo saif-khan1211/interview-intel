@@ -2,6 +2,7 @@ import type {
   AnalysisCreateResponse,
   AnalysisListItem,
   AnalysisStatusResponse,
+  MyResumeResponse,
   ResumeUploadResponse,
 } from "@/types/analysis";
 
@@ -26,6 +27,14 @@ async function apiFetch<T>(
   }
 
   return res.json() as Promise<T>;
+}
+
+export async function getMyResume(token: string): Promise<MyResumeResponse | null> {
+  try {
+    return await apiFetch<MyResumeResponse>("/api/resumes/me", token);
+  } catch {
+    return null;
+  }
 }
 
 export async function uploadResume(
@@ -65,4 +74,19 @@ export async function getAnalysis(
 
 export async function listAnalyses(token: string): Promise<AnalysisListItem[]> {
   return apiFetch<AnalysisListItem[]>("/api/analyses", token);
+}
+
+export async function extractJobPosting(
+  url: string,
+  token: string
+): Promise<{ company_name: string; role_title: string; jd_text: string }> {
+  return apiFetch<{ company_name: string; role_title: string; jd_text: string }>(
+    "/api/job-postings/extract",
+    token,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    }
+  );
 }

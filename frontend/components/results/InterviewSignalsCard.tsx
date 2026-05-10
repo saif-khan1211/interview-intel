@@ -9,6 +9,8 @@ export default function InterviewSignalsCard({
   plan: PrepPlan;
   company: string;
 }) {
+  const sources = plan.glassdoor_sources ?? [];
+
   return (
     <Card>
       <CardHeader>
@@ -17,7 +19,7 @@ export default function InterviewSignalsCard({
           <CardTitle className="text-base">Interview Signals — {company}</CardTitle>
         </div>
         <p className="text-xs text-muted-foreground">
-          What candidates report about this company&apos;s interview process
+          Sourced from Glassdoor interview reviews
         </p>
       </CardHeader>
       <CardContent>
@@ -29,6 +31,25 @@ export default function InterviewSignalsCard({
             </li>
           ))}
         </ul>
+
+        {sources.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-border flex flex-col gap-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+              Sources
+            </p>
+            {sources.map((url, i) => (
+              <a
+                key={url}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-primary hover:underline truncate"
+              >
+                Glassdoor review {i + 1}
+              </a>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

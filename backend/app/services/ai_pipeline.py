@@ -16,6 +16,7 @@ from app.services.ai_prompts import (
     RESUME_PARSER_SYSTEM,
     RESUME_PARSER_USER,
 )
+from app.services.google_scraper import scrape_glassdoor_snippets
 
 HAIKU_MODEL = "claude-haiku-4-5-20251001"
 SONNET_MODEL = "claude-sonnet-4-6"
@@ -31,10 +32,11 @@ async def _call_structured(
     system: str,
     user: str,
     response_model: type,
+    max_tokens: int = 2048,
 ) -> object:
     response = await client.messages.create(
         model=model,
-        max_tokens=2048,
+        max_tokens=max_tokens,
         system=system,
         messages=[{"role": "user", "content": user}],
     )
@@ -82,15 +84,15 @@ async def run_pipeline(
         ParsedJD,
     )
 
-    # Step 3: Interview signals
+    # Step 3: Real interview signals from Glassdoor via Google
+    snippets, glassdoor_urls = await scrape_glassdoor_snippets(company_name)
     signals: InterviewSignals = await _call_structured(
         client,
         HAIKU_MODEL,
         INTERVIEW_SIGNALS_SYSTEM,
         INTERVIEW_SIGNALS_USER.format(
             company_name=company_name,
-            role_type=parsed_jd.role_type,
-            seniority=parsed_jd.seniority,
+            snippets=snippets or "No Glassdoor data found.",
         ),
         InterviewSignals,
     )
@@ -107,6 +109,8 @@ async def run_pipeline(
             interview_signals=json.dumps(signals.model_dump(), indent=2),
         ),
         PrepPlan,
+        max_tokens=8192,
     )
 
+    prep_plan.glassdoor_sources = glassdoor_urls
     return prep_plan
